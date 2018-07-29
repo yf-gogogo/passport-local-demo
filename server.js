@@ -13,6 +13,7 @@ var db = require('./db');
 passport.use(new Strategy(
   function(username, password, cb) {
     db.users.findByUsername(username, function(err, user) {
+      console.log('策略配置',username,password);
       if (err) { return cb(err); }
       if (!user) { return cb(null, false); }
       if (user.password != password) { return cb(null, false); }
@@ -29,10 +30,12 @@ passport.use(new Strategy(
 // serializing, and querying the user record by ID from the database when
 // deserializing.
 passport.serializeUser(function(user, cb) {
+  console.log('序列化',user);
   cb(null, user.id);
 });
 
 passport.deserializeUser(function(id, cb) {
+  console.log('反序列化',id);
   db.users.findById(id, function (err, user) {
     if (err) { return cb(err); }
     cb(null, user);
@@ -54,7 +57,7 @@ app.set('view engine', 'ejs');
 app.use(require('morgan')('combined'));
 app.use(require('cookie-parser')());
 app.use(require('body-parser').urlencoded({ extended: true }));
-app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+app.use(require('express-session')({ name:'sid',secret: 'keyboard cat', resave: false, saveUninitialized: false }));
 
 // Initialize Passport and restore authentication state, if any, from the
 // session.
@@ -64,11 +67,19 @@ app.use(passport.session());
 // Define routes.
 app.get('/',
   function(req, res) {
+    console.log('/路径的Session：',req.session);
+    console.log('/路径的SessionID：',req.sessionID);
+    if(req.session.views){
+      req.session.views++;
+    }else{
+      req.session.views = 1;
+    }
     res.render('home', { user: req.user });
   });
 
 app.get('/login',
   function(req, res){
+    console.log('/login路径的Session：',req.session);
     res.render('login');
   });
   
