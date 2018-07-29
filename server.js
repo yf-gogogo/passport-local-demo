@@ -3,7 +3,6 @@ var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
 var db = require('./db');
 
-
 // Configure the local strategy for use by Passport.
 //
 // The local strategy require a `verify` function which receives the credentials
@@ -64,6 +63,8 @@ app.use(require('express-session')({ name:'sid',secret: 'keyboard cat', resave: 
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+
 // Define routes.
 app.get('/',
   function(req, res) {
@@ -102,3 +103,4 @@ app.get('/profile',
   });
 
 app.listen(3000);
+
